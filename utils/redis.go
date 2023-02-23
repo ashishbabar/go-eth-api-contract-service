@@ -2,13 +2,14 @@ package utils
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
 )
 
 type IRedisUtil interface {
-	GetVal(ctx context.Context, key string) string
+	GetVal(ctx context.Context, key string) (string, error)
 }
 type redisUtil struct {
 	client *redis.Client
@@ -25,6 +26,10 @@ func NewRedisUtil() IRedisUtil {
 	return &redisUtil{client: rdb}
 }
 
-func (rc *redisUtil) GetVal(ctx context.Context, key string) string {
-	return rc.client.Incr(ctx, key).String()
+func (rc *redisUtil) GetVal(ctx context.Context, key string) (string, error) {
+	newCounter, err := rc.client.Incr(ctx, key).Result()
+	if err != nil {
+		return "", err
+	}
+	return strconv.FormatInt(newCounter, 10), nil
 }

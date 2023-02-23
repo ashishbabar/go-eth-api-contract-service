@@ -29,16 +29,20 @@ func NewService(logger *zap.Logger, redisUtil utils.IRedisUtil, kafkaUtil utils.
 
 func (ser *service) Create(contract Contract) error {
 	ctx := context.Background()
-	val := ser.redisUtil.GetVal(ctx, viper.GetString("ContractID"))
-	ser.logger.Info("Retrieved new contract ID from redis : " + val)
+	newContractID, err := ser.redisUtil.GetVal(ctx, viper.GetString("RedisContractIDKey"))
+	if err != nil {
+		ser.logger.Error(err.Error())
+		return err
+	}
+	ser.logger.Info("Retrieved new contract ID from redis : " + newContractID)
 
-	contract.ID = val
+	contract.ID = newContractID
 	jsonContract, err := json.Marshal(contract)
 	if err != nil {
 		ser.logger.Error(err.Error())
 		return err
 	}
-	ser.logger.Info("Marshelled contract in json string")
+	ser.logger.Info("Marshelled contract in json string ", zap.Any("JsonContract", jsonContract))
 	ser.kafkaUtil.Produce(jsonContract)
 	ser.logger.Info("Produced message to kafka")
 	return nil

@@ -6,3 +6,5 @@ _*
 engine
 bin/
 *.out
+*.config
+.env

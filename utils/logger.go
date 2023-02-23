@@ -11,6 +11,14 @@ func init() {
 	config.OutputPaths = []string{"stdout"}
 	ZapLogger, _ = config.Build()
 }
+
+// func NewLogger() *zap.Logger {
+// 	config := zap.NewProductionConfig()
+// 	config.OutputPaths = []string{"stdout"}
+// 	ZapLogger, _ := config.Build()
+// 	return ZapLogger
+// }
+
 func getLogger() *zap.Logger {
 	return ZapLogger
 }
