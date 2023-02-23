@@ -1,5 +1,5 @@
 FROM golang:1.16-alpine
-WORKDIR $GOPATH/src/github.com/ashishbabar/go-eth-contract-service
+WORKDIR $GOPATH/src/github.com/ashishbabar/go-eth-api-contract-service
 
 COPY . .
 
@@ -9,4 +9,4 @@ RUN go install -v ./...
 
 EXPOSE 3000
 
-CMD [ "go-eth-contract-service" ]
+CMD [ "go-eth-api-contract-service" ]
