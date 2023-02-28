@@ -1,12 +1,14 @@
-FROM golang:1.16-alpine
+FROM golang:1.18-alpine
 WORKDIR $GOPATH/src/github.com/ashishbabar/go-eth-api-contract-service
 
 COPY . .
 
-RUN go get -d -v ./...
+RUN apk add --no-cache gcc musl-dev
 
-RUN go install -v ./...
+RUN go get -tags musl -d -v ./...
+
+RUN go build -tags musl -o app ./cmd/http.go
 
 EXPOSE 3000
 
-CMD [ "go-eth-api-contract-service" ]
+CMD [ "./app" ]

@@ -19,23 +19,28 @@ type kafkaUtil struct {
 
 func NewKafkaUtil() (IKafkaUtil, error) {
 
-	conf := readConfig("./kafka.config")
+	conf, err := readConfig("./kafka.config")
+	if err != nil {
+		ZapLogger.Error("Failed to create producer : " + err.Error())
+		return nil, err
+	}
 	p, err := kafka.NewProducer(&conf)
 	if err != nil {
-		fmt.Printf("Failed to create producer: %s\n", err)
+		ZapLogger.Error("Failed to create producer : " + err.Error())
 		return nil, err
 	}
 	return &kafkaUtil{producer: p}, nil
 }
 
-func readConfig(configFile string) kafka.ConfigMap {
+func readConfig(configFile string) (kafka.ConfigMap, error) {
 
 	m := make(map[string]kafka.ConfigValue)
 
 	file, err := os.Open(configFile)
 	if err != nil {
+		ZapLogger.Error("Failed to open file: " + err.Error())
 		fmt.Fprintf(os.Stderr, "Failed to open file: %s", err)
-		os.Exit(1)
+		return m, err
 	}
 	defer file.Close()
 
@@ -52,10 +57,10 @@ func readConfig(configFile string) kafka.ConfigMap {
 
 	if err := scanner.Err(); err != nil {
 		fmt.Printf("Failed to read file: %s", err)
-		os.Exit(1)
+		return m, err
 	}
 
-	return m
+	return m, nil
 
 }
 
